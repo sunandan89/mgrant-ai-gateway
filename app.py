@@ -7,6 +7,7 @@ import os, re, json, time, uuid, sqlite3, datetime
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 import anthropic
+from fastapi.middleware.cors import CORSMiddleware
 import prompt as P
 
 DB = os.environ.get("MGRANT_AI_DB", "usage.db")
@@ -16,6 +17,13 @@ RATES = json.loads(os.environ.get("MGRANT_AI_RATES", "{}"))       # {model: {in,
 
 client = anthropic.Anthropic()   # reads ANTHROPIC_API_KEY from env
 app = FastAPI(title="mGrant AI Gateway")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=json.loads(os.environ.get("MGRANT_AI_CORS_ORIGINS", '["*"]')),
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- PII redaction: never let raw PII reach the log (we log metadata only anyway) ---
 _PAN = re.compile(r"[A-Z]{5}[0-9]{4}[A-Z]")
