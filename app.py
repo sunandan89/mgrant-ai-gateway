@@ -44,7 +44,7 @@ def _month_spend(c, tenant):
     return row[0] or 0.0
 
 def _log(c, rid, tenant, req, itok, otok, cost, latency, status, err, verdict, flags):
-    c.execute("INSERT INTO usage_log VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (
+    c.execute("INSERT INTO usage_log VALUES (" + ",".join(["?"] * 19) + ")", (
         rid, datetime.datetime.utcnow().isoformat(timespec="seconds"), tenant, req.use_case,
         req.ref.get("doctype"), req.ref.get("name"), (req.document or {}).get("file_hash"),
         MODEL, req.prompt_version, itok, otok, cost, "INR", latency, status, err, verdict, flags, 0))
