@@ -44,10 +44,14 @@ def _month_spend(c, tenant):
     return row[0] or 0.0
 
 def _log(c, rid, tenant, req, itok, otok, cost, latency, status, err, verdict, flags):
-    c.execute("INSERT INTO usage_log VALUES (" + ",".join(["?"] * 19) + ")", (
+    vals = (
         rid, datetime.datetime.utcnow().isoformat(timespec="seconds"), tenant, req.use_case,
         req.ref.get("doctype"), req.ref.get("name"), (req.document or {}).get("file_hash"),
-        MODEL, req.prompt_version, itok, otok, cost, "INR", latency, status, err, verdict, flags, 0))
+        MODEL, req.prompt_version, itok, otok, cost, "INR", latency, status, err,
+        str(verdict) if verdict is not None else None,
+        int(flags) if isinstance(flags, (int, float)) else 0, 0)
+    vals = tuple(json.dumps(v) if isinstance(v, (dict, list)) else v for v in vals)
+    c.execute("INSERT INTO usage_log VALUES (" + ",".join(["?"] * 19) + ")", vals)
     c.commit()
 
 class CheckReq(BaseModel):
