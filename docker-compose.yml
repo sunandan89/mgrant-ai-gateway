@@ -1,0 +1,19 @@
+services:
+  gateway:
+    build: .
+    image: mgrant-ai-gateway:local
+    container_name: mgrant-ai-gateway
+    env_file: .env
+    environment:
+      # Keep the DB on the volume, not the container filesystem
+      MGRANT_AI_DB: /data/usage.db
+    ports:
+      # Bound to localhost only: /admin/usage has no authentication.
+      # Put this behind nginx + auth before exposing it publicly.
+      - "127.0.0.1:3007:8080"
+    volumes:
+      - gateway-data:/data
+    restart: unless-stopped
+
+volumes:
+  gateway-data:

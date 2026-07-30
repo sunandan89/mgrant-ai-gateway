@@ -1,0 +1,14 @@
+# Secrets — the LLM key and tenant tokens live here
+.env
+.env.local
+
+# SQLite usage/audit store
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
